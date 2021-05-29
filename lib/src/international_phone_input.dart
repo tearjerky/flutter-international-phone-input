@@ -34,7 +34,8 @@ class InternationalPhoneInput extends StatefulWidget {
   final InputValidator_Listener inputValidator_Listener;
 
   InternationalPhoneInput(
-      {this.inputValidator_Listener,
+      {
+        this.inputValidator_Listener,
       this.isDefault,
       this.key,
       this.initialPhoneNumber,
@@ -51,7 +52,7 @@ class InternationalPhoneInput extends StatefulWidget {
       this.showCountryCodes = true,
       this.showCountryFlags = true,
       this.dropdownIcon,
-      this.removeDuplicates,
+      this.removeDuplicates = const [],
       this.border})
       : super(key: key);
 
