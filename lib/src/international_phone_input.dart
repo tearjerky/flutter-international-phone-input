@@ -3,15 +3,16 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:international_phone_input/src/phone_service.dart';
+import 'package:international_phone_input/src/validator_response.dart';
 
 import 'country.dart';
+import 'inputvalidator_listener.dart';
 
 class InternationalPhoneInput extends StatefulWidget {
-  final void Function(String phoneNumber, String internationalizedPhoneNumber,
-      String isoCode, String dialCode) onPhoneNumberChange;
   final String initialPhoneNumber;
   final String initialSelection;
   final String errorText;
@@ -27,9 +28,15 @@ class InternationalPhoneInput extends StatefulWidget {
   final bool showCountryFlags;
   final Widget dropdownIcon;
   final InputBorder border;
+  final Key key;
+  final List<String> removeDuplicates;
+  final bool isDefault;
+  final InputValidator_Listener inputValidator_Listener;
 
   InternationalPhoneInput(
-      {this.onPhoneNumberChange,
+      {this.inputValidator_Listener,
+      this.isDefault,
+      this.key,
       this.initialPhoneNumber,
       this.initialSelection,
       this.errorText,
@@ -44,7 +51,9 @@ class InternationalPhoneInput extends StatefulWidget {
       this.showCountryCodes = true,
       this.showCountryFlags = true,
       this.dropdownIcon,
-      this.border});
+      this.removeDuplicates,
+      this.border})
+      : super(key: key);
 
   static Future<String> internationalizeNumber(String number, String iso) {
     return PhoneService.getNormalizedPhoneNumber(number, iso);
@@ -129,17 +138,20 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
         setState(() {
           hasError = !isValid;
         });
-
-        if (widget.onPhoneNumberChange != null) {
+        if(widget.inputValidator_Listener != null){
           if (isValid) {
             PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
                 .then((number) {
-              widget.onPhoneNumberChange(phoneText, number, selectedItem.code, selectedItem.dialCode);
+              widget.inputValidator_Listener.sink.add(
+                  Validator_Response(number:phoneText, internationalizedPhoneNumber:number, isoCode:selectedItem.code, dialCode:selectedItem.dialCode));
             });
           } else {
-            widget.onPhoneNumberChange('', '', selectedItem.code, selectedItem.dialCode);
+            widget.inputValidator_Listener.sink.add(
+                Validator_Response(number:'', internationalizedPhoneNumber:'', isoCode:selectedItem.code, dialCode:selectedItem.dialCode));
           }
         }
+
+
       });
     }
   }
@@ -151,14 +163,15 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
     List<Country> countries = List<Country>.generate(jsonList.length, (index) {
       Map<String, String> elem = Map<String, String>.from(jsonList[index]);
-      if (widget.enabledCountries.isEmpty) {
+      if (widget.enabledCountries.isEmpty && widget.removeDuplicates.isEmpty) {
         return Country(
             name: elem['en_short_name'],
             code: elem['alpha_2_code'],
             dialCode: elem['dial_code'],
             flagUri: 'assets/flags/${elem['alpha_2_code'].toLowerCase()}.png');
       } else if (widget.enabledCountries.contains(elem['alpha_2_code']) ||
-          widget.enabledCountries.contains(elem['dial_code'])) {
+          widget.enabledCountries.contains(elem['dial_code']) &&
+              !widget.enabledCountries.contains(elem['alpha_2_code'])) {
         return Country(
             name: elem['en_short_name'],
             code: elem['alpha_2_code'],
@@ -224,21 +237,26 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
             ),
           ),
           Flexible(
-              child: TextField(
-            keyboardType: TextInputType.phone,
-            controller: phoneTextController,
-            decoration: decoration ??
-                InputDecoration(
-                  hintText: hintText,
-                  labelText: labelText,
-                  errorText: hasError ? errorText : null,
-                  hintStyle: hintStyle ?? null,
-                  errorStyle: errorStyle ?? null,
-                  labelStyle: labelStyle,
-                  errorMaxLines: errorMaxLines ?? 3,
-                  border: border ?? null,
-                ),
-          ))
+              child: widget.isDefault
+                  ? TextField(
+                      keyboardType: TextInputType.phone,
+                      controller: phoneTextController,
+                      decoration: decoration ??
+                          InputDecoration(
+                            hintText: hintText,
+                            labelText: labelText,
+                            errorText: hasError ? errorText : null,
+                            hintStyle: hintStyle ?? null,
+                            errorStyle: errorStyle ?? null,
+                            labelStyle: labelStyle,
+                            errorMaxLines: errorMaxLines ?? 3,
+                            border: border ?? null,
+                          ),
+                    )
+                  : CupertinoTextField(
+                      controller: phoneTextController,
+                      placeholder: hintText,
+                    ))
         ],
       ),
     );
