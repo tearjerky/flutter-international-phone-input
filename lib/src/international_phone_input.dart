@@ -170,9 +170,9 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
             code: elem['alpha_2_code'],
             dialCode: elem['dial_code'],
             flagUri: 'assets/flags/${elem['alpha_2_code'].toLowerCase()}.png');
-      } else if (widget.enabledCountries.contains(elem['alpha_2_code']) ||
-          widget.enabledCountries.contains(elem['dial_code']) &&
-              !widget.enabledCountries.contains(elem['alpha_2_code'])) {
+      } else if ((widget.enabledCountries.contains(elem['alpha_2_code']) ||
+          widget.enabledCountries.contains(elem['dial_code'])) &&
+            widget.removeDuplicates.contains(elem['alpha_2_code'])) {
         return Country(
             name: elem['en_short_name'],
             code: elem['alpha_2_code'],
