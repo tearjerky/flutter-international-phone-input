@@ -13,6 +13,8 @@ import 'country.dart';
 import 'inputvalidator_listener.dart';
 
 class InternationalPhoneInput extends StatefulWidget {
+  final void Function(String phoneNumber, String internationalizedPhoneNumber,
+      String isoCode, String dialCode,bool isValid) onPhoneNumberChange;
   final String initialPhoneNumber;
   final String initialSelection;
   final String errorText;
@@ -31,11 +33,10 @@ class InternationalPhoneInput extends StatefulWidget {
   final Key key;
   final List<String> removeDuplicates;
   final bool isDefault;
-  final InputValidator_Listener inputValidator_Listener;
 
   InternationalPhoneInput(
       {
-        this.inputValidator_Listener,
+        this.onPhoneNumberChange,
       this.isDefault,
       this.key,
       this.initialPhoneNumber,
@@ -139,16 +140,14 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
         setState(() {
           hasError = !isValid;
         });
-        if(widget.inputValidator_Listener != null){
+        if (widget.onPhoneNumberChange != null) {
           if (isValid) {
             PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
                 .then((number) {
-              widget.inputValidator_Listener.sink.add(
-                  Validator_Response(number:phoneText, internationalizedPhoneNumber:number, isoCode:selectedItem.code, dialCode:selectedItem.dialCode));
+              widget.onPhoneNumberChange(phoneText, number, selectedItem.code, selectedItem.dialCode,true);
             });
           } else {
-            widget.inputValidator_Listener.sink.add(
-                Validator_Response(number:'', internationalizedPhoneNumber:'', isoCode:selectedItem.code, dialCode:selectedItem.dialCode));
+            widget.onPhoneNumberChange('', '', selectedItem.code, selectedItem.dialCode,false);
           }
         }
 
@@ -255,6 +254,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                           ),
                     )
                   : CupertinoTextField(
+                      keyboardType: TextInputType.phone,
                       controller: phoneTextController,
                       placeholder: hintText,
                     ))
