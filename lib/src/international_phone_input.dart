@@ -91,7 +91,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
   _InternationalPhoneInputState();
 
-
+  final phoneTextController = TextEditingController();
   @override
   void initState() {
     errorText = widget.errorText ?? 'Please enter a valid phone number';
@@ -106,7 +106,8 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     showCountryFlags = widget.showCountryFlags;
     dropdownIcon = widget.dropdownIcon;
 
-    _validatePhoneNumber();
+    phoneTextController.addListener(_validatePhoneNumber);
+    phoneTextController.text = widget.initialPhoneNumber;
 
 
     _fetchCountryData().then((list) {
@@ -133,8 +134,9 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     super.initState();
   }
 
+
   _validatePhoneNumber() {
-    String phoneText = widget.controller.text;
+    String phoneText = phoneTextController.text;
     if (phoneText != null && phoneText.isNotEmpty) {
       PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
           .then((isValid) {
@@ -155,7 +157,6 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
       });
     }
   }
-
   Future<List<Country>> _fetchCountryData() async {
     var list = await DefaultAssetBundle.of(context)
         .loadString('packages/international_phone_input/assets/countries.json');
@@ -240,7 +241,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
               child: widget.isDefault
                   ? TextField(
                       keyboardType: TextInputType.phone,
-                      controller: widget.controller,
+                      controller:  phoneTextController,
                       decoration: decoration ??
                           InputDecoration(
                             hintText: hintText,
@@ -255,7 +256,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                     )
                   : CupertinoTextField(
                       keyboardType: TextInputType.phone,
-                      controller:  widget.controller,
+                      controller:  phoneTextController,
                       placeholder: hintText,
                     ))
         ],
