@@ -30,14 +30,12 @@ class InternationalPhoneInput extends StatefulWidget {
   final Key key;
   final List<String> removeDuplicates;
   final bool isDefault;
-  final TextEditingController controller;
   final void Function(String phoneNumber, String internationalizedPhoneNumber,
       String isoCode, String dialCode) onPhoneNumberChange;
 
   InternationalPhoneInput(
       {
         this.onPhoneNumberChange,
-        this.controller,
       this.isDefault,
       this.key,
       this.initialPhoneNumber,
