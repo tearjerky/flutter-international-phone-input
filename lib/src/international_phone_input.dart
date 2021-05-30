@@ -154,6 +154,9 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
 
       });
+    }else{
+      widget.inputValidator_Listener.sink.add(Validator_Response(number: phoneText,dialCode:  selectedItem.dialCode,isoCode: selectedItem.code,isValid: false));
+
     }
   }
 
