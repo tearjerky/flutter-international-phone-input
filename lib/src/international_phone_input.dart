@@ -34,9 +34,11 @@ class InternationalPhoneInput extends StatefulWidget {
   final List<String> removeDuplicates;
   final bool isDefault;
   final  InputValidator_Listener inputValidator_Listener;
+  final TextEditingController controller;
 
   InternationalPhoneInput(
       {
+        this.controller,
         this.inputValidator_Listener,
         this.onPhoneNumberChange,
       this.isDefault,
@@ -108,8 +110,8 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     showCountryFlags = widget.showCountryFlags;
     dropdownIcon = widget.dropdownIcon;
 
-    phoneTextController.addListener(_validatePhoneNumber);
-    phoneTextController.text = widget.initialPhoneNumber;
+    widget.controller.addListener(_validatePhoneNumber);
+    widget.controller.text = widget.initialPhoneNumber;
 
     _fetchCountryData().then((list) {
       Country preSelectedItem;
@@ -130,17 +132,13 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
         selectedItem = preSelectedItem;
       });
     });
-    if(widget.inputValidator_Listener != null) {
-      widget.inputValidator_Listener.stream.listen((event) {
-        phoneTextController.text = event.number;
-        widget.initialSelection = event.dialCode;
-      });
-    }
+
+
     super.initState();
   }
 
   _validatePhoneNumber() {
-    String phoneText = phoneTextController.text;
+    String phoneText = widget.controller.text;
     if (phoneText != null && phoneText.isNotEmpty) {
       PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
           .then((isValid) {
@@ -247,7 +245,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
               child: widget.isDefault
                   ? TextField(
                       keyboardType: TextInputType.phone,
-                      controller: phoneTextController,
+                      controller: widget.controller,
                       decoration: decoration ??
                           InputDecoration(
                             hintText: hintText,
@@ -262,7 +260,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
                     )
                   : CupertinoTextField(
                       keyboardType: TextInputType.phone,
-                      controller: phoneTextController,
+                      controller:  widget.controller,
                       placeholder: hintText,
                     ))
         ],
