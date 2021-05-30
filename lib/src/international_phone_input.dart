@@ -16,7 +16,7 @@ class InternationalPhoneInput extends StatefulWidget {
   final void Function(String phoneNumber, String internationalizedPhoneNumber,
       String isoCode, String dialCode,bool isValid) onPhoneNumberChange;
   final String initialPhoneNumber;
-  final String initialSelection;
+  String initialSelection;
   final String errorText;
   final String hintText;
   final String labelText;
@@ -33,9 +33,11 @@ class InternationalPhoneInput extends StatefulWidget {
   final Key key;
   final List<String> removeDuplicates;
   final bool isDefault;
+  final  InputValidator_Listener inputValidator_Listener;
 
   InternationalPhoneInput(
       {
+        this.inputValidator_Listener,
         this.onPhoneNumberChange,
       this.isDefault,
       this.key,
@@ -128,7 +130,12 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
         selectedItem = preSelectedItem;
       });
     });
-
+    if(widget.inputValidator_Listener != null) {
+      widget.inputValidator_Listener.stream.listen((event) {
+        phoneTextController.text = event.number;
+        widget.initialSelection = event.dialCode;
+      });
+    }
     super.initState();
   }
 
