@@ -13,8 +13,6 @@ import 'country.dart';
 import 'inputvalidator_listener.dart';
 
 class InternationalPhoneInput extends StatefulWidget {
-  final void Function(String phoneNumber, String internationalizedPhoneNumber,
-      String isoCode, String dialCode,bool isValid) onPhoneNumberChange;
   final String initialPhoneNumber;
   String initialSelection;
   final String errorText;
@@ -40,7 +38,6 @@ class InternationalPhoneInput extends StatefulWidget {
       {
         this.controller,
         this.inputValidator_Listener,
-        this.onPhoneNumberChange,
       this.isDefault,
       this.key,
       this.initialPhoneNumber,
@@ -94,7 +91,6 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
 
   _InternationalPhoneInputState();
 
-  final phoneTextController = TextEditingController();
 
   @override
   void initState() {
@@ -111,7 +107,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
     dropdownIcon = widget.dropdownIcon;
 
     widget.controller.addListener(_validatePhoneNumber);
-    widget.controller.text = widget.initialPhoneNumber;
+
 
     _fetchCountryData().then((list) {
       Country preSelectedItem;
@@ -145,16 +141,16 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInput> {
         setState(() {
           hasError = !isValid;
         });
-        if (widget.onPhoneNumberChange != null) {
-          if (isValid) {
-            PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
-                .then((number) {
-              widget.onPhoneNumberChange(phoneText, number, selectedItem.code, selectedItem.dialCode,true);
-            });
+        if(widget.inputValidator_Listener != null){
+          if (!isValid) {
+            widget.inputValidator_Listener.sink.add(Validator_Response(number: phoneText,dialCode: selectedItem.dialCode,isoCode: selectedItem.code,isValid: false,));
           } else {
-            widget.onPhoneNumberChange('', '', selectedItem.code, selectedItem.dialCode,false);
+            widget.inputValidator_Listener.sink.add(Validator_Response(number: phoneText,dialCode:  selectedItem.dialCode,isoCode: selectedItem.code,isValid: true));
           }
+
         }
+
+
 
 
       });

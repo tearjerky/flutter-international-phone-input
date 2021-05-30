@@ -3,5 +3,6 @@ class Validator_Response{
   String internationalizedPhoneNumber;
   String isoCode;
   String dialCode;
-  Validator_Response({this.number,this.internationalizedPhoneNumber,this.isoCode,this.dialCode});
+  bool isValid;
+  Validator_Response({this.number,this.internationalizedPhoneNumber,this.isoCode,this.dialCode,this.isValid});
 }
