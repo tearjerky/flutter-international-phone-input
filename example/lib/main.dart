@@ -21,11 +21,20 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class ValueA {
+  String code, dialCode, number, internationalize;
+
+  ValueA({this.code, this.dialCode, this.number, this.internationalize});
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   String phoneNumber;
   String phoneIsoCode;
   bool visible = false;
   String confirmedNumber = '';
+
+  final ValueNotifier<ValueA> _counter = ValueNotifier<ValueA>(
+      ValueA(code: 'US', dialCode: '+1', number: '', internationalize: ''));
 
   void onPhoneNumberChange(
       String number, String internationalizedPhoneNumber, String isoCode) {
@@ -62,15 +71,16 @@ class _MyHomePageState extends State<MyHomePage> {
               labelText: "Phone Number",
             ),
             SizedBox(height: 20),
-            InternationalPhoneInput(
-              decoration: InputDecoration.collapsed(hintText: '(123) 123-1234'),
+           /* InternationalPhoneInputController(
+              decoration:
+              InputDecoration.collapsed(hintText: '(123) 123-1234'),
               onPhoneNumberChange: onPhoneNumberChange,
-              initialPhoneNumber: phoneNumber,
-              initialSelection: phoneIsoCode,
+              initialPhoneNumber: "",
+              initialSelection: "",
               enabledCountries: ['+233', '+1'],
               showCountryCodes: false,
               showCountryFlags: true,
-            ),
+            )*/
             SizedBox(height: 20),
             Container(
               width: double.infinity,
