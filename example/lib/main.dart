@@ -37,13 +37,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ValueA(code: 'US', dialCode: '+1', number: '', internationalize: ''));
 
   void onPhoneNumberChange(
-      String number, String internationalizedPhoneNumber, String isoCode) {
+      String number, String internationalizedPhoneNumber, String isoCode,String dial) {
     print(number);
     setState(() {
       phoneNumber = number;
       phoneIsoCode = isoCode;
     });
   }
+  TextEditingController controller = new TextEditingController();
 
   onValidPhoneNumber(
       String number, String internationalizedPhoneNumber, String isoCode) {
@@ -63,24 +64,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: <Widget>[
             Spacer(flex: 1),
-            InternationalPhoneInput(
-              onPhoneNumberChange: onPhoneNumberChange,
-              initialPhoneNumber: phoneNumber,
-              initialSelection: phoneIsoCode,
-              enabledCountries: ['+233', '+1'],
-              labelText: "Phone Number",
-            ),
             SizedBox(height: 20),
-           /* InternationalPhoneInputController(
+           InternationalPhoneInputController(
+             initialSelection: "+1",
               decoration:
               InputDecoration.collapsed(hintText: '(123) 123-1234'),
               onPhoneNumberChange: onPhoneNumberChange,
-              initialPhoneNumber: "",
-              initialSelection: "",
               enabledCountries: ['+233', '+1'],
               showCountryCodes: false,
               showCountryFlags: true,
-            )*/
+             controller: controller,
+            ),
             SizedBox(height: 20),
             Container(
               width: double.infinity,

@@ -12,8 +12,8 @@ import 'country.dart';
 
 class InternationalPhoneInputController extends StatefulWidget {
 /*  final String initialPhoneNumber;
-  String initialSelection;
-
+ */
+ String initialSelection;
   final String errorText;
   final String hintText;
   final String labelText;
@@ -21,26 +21,22 @@ class InternationalPhoneInputController extends StatefulWidget {
   final TextStyle hintStyle;
   final TextStyle labelStyle;
   final int errorMaxLines;
-  final List<String> enabledCountries;
-
-  final Widget dropdownIcon;
-  final InputBorder border;
-  final Key key;
-  final List<String> removeDuplicates;
-  final bool isDefault;*/
-
   final bool showCountryCodes;
   final bool showCountryFlags;
   final Widget dropdownIcon;
   final List<String> removeDuplicates;
   final List<String> enabledCountries;
   final InputDecoration decoration;
+  final Widget dropdownIcon;
+  final InputBorder border;
+
   final void Function(String phoneNumber, String internationalizedPhoneNumber,
       String isoCode, String dialCode) onPhoneNumberChange;
   final Key key;
   final TextEditingController controller;
   InternationalPhoneInputController(
       {
+        this.initialSelection,
         this.onPhoneNumberChange,
         this.enabledCountries,
         this.removeDuplicates,
@@ -49,25 +45,15 @@ class InternationalPhoneInputController extends StatefulWidget {
         this.decoration,
         this.showCountryCodes,
         this.showCountryFlags,
-        this.controller
-     /* this.isDefault,
-      this.key,
-      this.initialPhoneNumber,
-      this.initialSelection,
+        this.controller,
       this.errorText,
       this.hintText,
       this.labelText,
       this.errorStyle,
       this.hintStyle,
       this.labelStyle,
-      this.enabledCountries = const [],
       this.errorMaxLines,
-      this.decoration,
-      this.showCountryCodes = true,
-      this.showCountryFlags = true,
-      this.dropdownIcon,
-      this.removeDuplicates = const [],
-      this.border*/
+      this.border
       })
       : super(key: key);
 
@@ -113,7 +99,6 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
   final phoneTextController = TextEditingController();
   @override
   void initState() {
-/*
     errorText = widget.errorText ?? 'Please enter a valid phone number';
     hintText = widget.hintText ?? 'eg. 244056345';
     labelText = widget.labelText;
@@ -125,19 +110,26 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
     showCountryCodes = widget.showCountryCodes;
     showCountryFlags = widget.showCountryFlags;
     dropdownIcon = widget.dropdownIcon;
+/*
+
+
 
     phoneTextController.addListener(_validatePhoneNumber);
     phoneTextController.text = widget.initialPhoneNumber;
 
+
+
+
+*/
 
     _fetchCountryData().then((list) {
       Country preSelectedItem;
 
       if (widget.initialSelection != null) {
         preSelectedItem = list.firstWhere(
-            (e) =>
-                (e.code.toUpperCase() ==
-                    widget.initialSelection.toUpperCase()) ||
+                (e) =>
+            (e.code.toUpperCase() ==
+                widget.initialSelection.toUpperCase()) ||
                 (e.dialCode == widget.initialSelection.toString()),
             orElse: () => list[0]);
       } else {
@@ -149,9 +141,6 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
         selectedItem = preSelectedItem;
       });
     });
-*/
-
-
     super.initState();
   }
 
