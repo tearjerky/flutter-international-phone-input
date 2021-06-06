@@ -27,7 +27,6 @@ class InternationalPhoneInputController extends StatefulWidget {
   final List<String> removeDuplicates;
   final List<String> enabledCountries;
   final InputDecoration decoration;
-  final Widget dropdownIcon;
   final InputBorder border;
 
   final void Function(String phoneNumber, String internationalizedPhoneNumber,

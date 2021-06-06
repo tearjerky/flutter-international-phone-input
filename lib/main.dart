@@ -71,8 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
               InputDecoration.collapsed(hintText: '(123) 123-1234'),
               onPhoneNumberChange: onPhoneNumberChange,
               enabledCountries: ['+233', '+1'],
-              showCountryCodes: false,
+               removeDuplicates: ["CA"],
+              showCountryCodes: true,
               showCountryFlags: true,
+
              controller: controller,
             ),
             SizedBox(height: 20),
