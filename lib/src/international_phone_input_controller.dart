@@ -11,9 +11,7 @@ import 'package:international_phone_input/src/phone_service.dart';
 import 'country.dart';
 
 class InternationalPhoneInputController extends StatefulWidget {
-/*  final String initialPhoneNumber;
- */
- String initialSelection;
+  final  String initialSelection;
   final String errorText;
   final String hintText;
   final String labelText;
@@ -28,9 +26,9 @@ class InternationalPhoneInputController extends StatefulWidget {
   final List<String> enabledCountries;
   final InputDecoration decoration;
   final InputBorder border;
-
+  final bool withError;
   final void Function(String phoneNumber, String internationalizedPhoneNumber,
-      String isoCode, String dialCode) onPhoneNumberChange;
+      String isoCode, String dialCode,bool isValid) onPhoneNumberChange;
   final Key key;
   final TextEditingController controller;
   InternationalPhoneInputController(
@@ -45,17 +43,17 @@ class InternationalPhoneInputController extends StatefulWidget {
         this.showCountryCodes,
         this.showCountryFlags,
         this.controller,
-      this.errorText,
-      this.hintText,
-      this.labelText,
-      this.errorStyle,
-      this.hintStyle,
-      this.labelStyle,
-      this.errorMaxLines,
-      this.border
+        this.errorText,
+        this.hintText,
+        this.labelText,
+        this.errorStyle,
+        this.hintStyle,
+        this.labelStyle,
+        this.errorMaxLines,
+        this.border,
+        this.withError
       })
       : super(key: key);
-
   static Future<String> internationalizeNumber(String number, String iso) {
     return PhoneService.getNormalizedPhoneNumber(number, iso);
   }
@@ -66,32 +64,22 @@ class InternationalPhoneInputController extends StatefulWidget {
 }
 
 class _InternationalPhoneInputState extends State<InternationalPhoneInputController> {
- Country selectedItem;
- List<Country> itemList = [];
- Widget dropdownIcon;
- InputDecoration decoration;
- bool showCountryCodes;
- bool showCountryFlags;
-
-
- String errorText;
- String hintText;
- String labelText;
-
- TextStyle errorStyle;
- TextStyle hintStyle;
- TextStyle labelStyle;
- bool hasError = false;
- InputBorder border;
- int errorMaxLines;
-
- /*
-
-
-
-
-
-*/
+  Country selectedItem;
+  List<Country> itemList = [];
+  Widget dropdownIcon;
+  InputDecoration decoration;
+  bool showCountryCodes;
+  bool showCountryFlags;
+  bool withError;
+  String errorText;
+  String hintText;
+  String labelText;
+  TextStyle errorStyle;
+  TextStyle hintStyle;
+  TextStyle labelStyle;
+  bool hasError = false;
+  InputBorder border;
+  int errorMaxLines;
 
   _InternationalPhoneInputState();
 
@@ -109,20 +97,20 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
     showCountryCodes = widget.showCountryCodes;
     showCountryFlags = widget.showCountryFlags;
     dropdownIcon = widget.dropdownIcon;
-/*
-
-
-
-    phoneTextController.addListener(_validatePhoneNumber);
-    phoneTextController.text = widget.initialPhoneNumber;
-
-
-
-
-*/
-
+    withError = widget.withError;
+    widget.controller.addListener(() {
+      final String text = widget.controller.text.toLowerCase();
+      widget.controller.value = widget.controller.value.copyWith(
+        text: text,
+        selection:
+        TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+      _validatePhoneNumber(text);
+    });
     _fetchCountryData().then((list) {
       Country preSelectedItem;
+
 
       if (widget.initialSelection != null) {
         preSelectedItem = list.firstWhere(
@@ -138,33 +126,42 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
       setState(() {
         itemList = list;
         selectedItem = preSelectedItem;
+
+        _validatePhoneNumber(widget.controller.text);
       });
     });
+
+
     super.initState();
   }
 
 
-  _validatePhoneNumber() {
-/*    String phoneText = phoneTextController.text;
-    if (phoneText != null && phoneText.isNotEmpty) {
-      PhoneService.parsePhoneNumber(phoneText, selectedItem.code)
+  _validatePhoneNumber(String number) {
+
+    if (number != null) {
+      PhoneService.parsePhoneNumber(number, selectedItem.code)
           .then((isValid) {
-        setState(() {
-          hasError = !isValid;
-        });
+
+        if(withError){
+          setState(() {
+            hasError = !isValid;
+          });
+        }
 
         if (widget.onPhoneNumberChange != null) {
           if (isValid) {
-            PhoneService.getNormalizedPhoneNumber(phoneText, selectedItem.code)
+
+            PhoneService.getNormalizedPhoneNumber(widget.controller.text, selectedItem.code)
                 .then((number) {
-              widget.onPhoneNumberChange(phoneText, number, selectedItem.code, selectedItem.dialCode);
+              widget.onPhoneNumberChange(widget.controller.text, number, selectedItem.code, selectedItem.dialCode,true);
             });
           } else {
-            widget.onPhoneNumberChange('', '', selectedItem.code, selectedItem.dialCode);
+
+            widget.onPhoneNumberChange('', '', selectedItem.code, selectedItem.dialCode,false);
           }
         }
       });
-    }*/
+    }
   }
   Future<List<Country>> _fetchCountryData() async {
 
@@ -182,7 +179,7 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
             flagUri: 'assets/flags/${elem['alpha_2_code'].toLowerCase()}.png');
       } else if ((widget.enabledCountries.contains(elem['alpha_2_code']) ||
           widget.enabledCountries.contains(elem['dial_code'])) &&
-            !widget.removeDuplicates.contains(elem['alpha_2_code'])) {
+          !widget.removeDuplicates.contains(elem['alpha_2_code'])) {
         return Country(
             name: elem['en_short_name'],
             code: elem['alpha_2_code'],
@@ -212,14 +209,16 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
                 value: selectedItem,
                 icon: Padding(
                   padding:
-                      EdgeInsets.only(bottom: (decoration != null) ? 6 : 0),
+                  EdgeInsets.only(bottom: (decoration != null) ? 6 : 0),
                   child: dropdownIcon ?? Icon(Icons.arrow_drop_down),
                 ),
                 onChanged: (Country newValue) {
                   setState(() {
                     selectedItem = newValue;
+                    _validatePhoneNumber(widget.controller.text);
+
                   });
-                  _validatePhoneNumber();
+                  // _validatePhoneNumber(widget.controller.text);
                 },
                 items: itemList.map<DropdownMenuItem<Country>>((Country value) {
                   return DropdownMenuItem<Country>(
@@ -250,21 +249,21 @@ class _InternationalPhoneInputState extends State<InternationalPhoneInputControl
           ),
           Flexible(
               child: TextField(
-                      keyboardType: TextInputType.phone,
-                      controller:  widget.controller,
-                      decoration: decoration ??
-                          InputDecoration(
-                            hintText: hintText,
-                            labelText: labelText,
-                            errorText: hasError ? errorText : null,
-                            hintStyle: hintStyle ?? null,
-                            errorStyle: errorStyle ?? null,
-                            labelStyle: labelStyle,
-                            errorMaxLines: errorMaxLines ?? 3,
-                            border: border ?? null,
-                          ),
-                    )
-                 )
+                keyboardType: TextInputType.phone,
+                controller:  widget.controller,
+                decoration: decoration ??
+                    InputDecoration(
+                      hintText: hintText,
+                      labelText: labelText,
+                      errorText: hasError ? errorText : null,
+                      hintStyle: hintStyle ?? null,
+                      errorStyle: errorStyle ?? null,
+                      labelStyle: labelStyle,
+                      errorMaxLines: errorMaxLines ?? 3,
+                      border: border ?? null,
+                    ),
+              )
+          )
         ],
       ),
     );

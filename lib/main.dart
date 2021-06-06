@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ValueA(code: 'US', dialCode: '+1', number: '', internationalize: ''));
 
   void onPhoneNumberChange(
-      String number, String internationalizedPhoneNumber, String isoCode,String dial) {
+      String number, String internationalizedPhoneNumber, String isoCode,String dial,bool valid) {
     print(number);
     setState(() {
       phoneNumber = number;
@@ -46,13 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   TextEditingController controller = new TextEditingController();
 
-  onValidPhoneNumber(
-      String number, String internationalizedPhoneNumber, String isoCode) {
-    setState(() {
-      visible = true;
-      confirmedNumber = internationalizedPhoneNumber;
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
                removeDuplicates: ["CA"],
               showCountryCodes: true,
               showCountryFlags: true,
-
-             controller: controller,
+               controller: controller,
             ),
             SizedBox(height: 20),
             Container(
@@ -84,9 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.black,
             ),
             SizedBox(height: 50),
-            InternationalPhoneInputText(
-              onValidPhoneNumber: onValidPhoneNumber,
-            ),
             Visibility(
               child: Text(confirmedNumber),
               visible: visible,
